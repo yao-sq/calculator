@@ -1,12 +1,11 @@
 package uk.ac.bath.yy.srpn;
 
-import java.net.Inet4Address;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Arrays.asList;
+import static java.util.Comparator.comparingInt;
 
 /**
  * Task: write a program which matches the functionality of SRPN as closely as possible, but not adding/enhancing existing features
@@ -40,6 +39,9 @@ import java.util.regex.Pattern;
  */
 
 public class SRPN {
+    private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#]+)");
+    private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "d", "^", "*", "/", "%", "+", "-")::indexOf);
+
     private int result;
     Stack stack = new Stack<Integer>();
     boolean isComment;
@@ -201,28 +203,28 @@ public class SRPN {
 
 
 //        String patternToken = "(?<number>\\d*)?|(?<operator>\\+|-|\\*|/|%|=|d)?";
-//        String patternToken = "(-?\\d+)|[=^*/+\\-%d#]";
-
-        // Create a Pattern object
-        Pattern r = Pattern.compile("(-?\\d+)|(?:(=)|(\\^)|(\\*)|(/)|(\\+)|(-)|(%)|(d)|(#))+");
+//        String patternToken = "(-?\\d+)|[=^*/+\\-%d#]+";
 
         // Now create Matcher object
-        Matcher m = r.matcher(line);
-
+        Matcher m = PATTERN_TOKEN.matcher(line);
         while (m.find()){
             if (m.group().equals("#")){
                 isComment = !isComment;
                 continue;
             }
 
-            if ( !isComment) {
-                for (int i = 1; i < m.groupCount(); i++) {
-                    String command = m.group(i);
-                    if (command != null) {
-//                        System.out.println("Found: " + command);
-                        processCommand(command);
-                    }
-                }
+            if (isComment) {
+                continue;
+            }
+
+            String[] commands = {m.group()};
+            if (m.group("operators") != null) {
+                commands = m.group("operators").split("");
+                Arrays.sort(commands, OPERATOR_COMPARATOR);
+            }
+            for (String command : commands) {
+//                    System.out.println("Found: " + command);
+                processCommand(command);
             }
         }
 
