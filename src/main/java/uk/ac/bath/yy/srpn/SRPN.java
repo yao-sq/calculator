@@ -200,11 +200,11 @@ public class SRPN {
         line = line.replaceAll("#.*#", "");
 
 
-//        String pattern = "(?<number>\\d*)?|(?<operator>\\+|-|\\*|/|%|=|d)?";
-        String patternSeperation = "(?<number>-?\\d+)|(?<operator>\\+|-|\\*|/|%|=|[d]|\\^)|#";
+//        String patternToken = "(?<number>\\d*)?|(?<operator>\\+|-|\\*|/|%|=|d)?";
+//        String patternToken = "(-?\\d+)|[=^*/+\\-%d#]";
 
         // Create a Pattern object
-        Pattern r = Pattern.compile(patternSeperation);
+        Pattern r = Pattern.compile("(-?\\d+)|(?:(=)|(\\^)|(\\*)|(/)|(\\+)|(-)|(%)|(d)|(#))+");
 
         // Now create Matcher object
         Matcher m = r.matcher(line);
@@ -216,8 +216,13 @@ public class SRPN {
             }
 
             if ( !isComment) {
-                System.out.println("Found: " + m.group());
-                processCommand(m.group());
+                for (int i = 1; i < m.groupCount(); i++) {
+                    String command = m.group(i);
+                    if (command != null) {
+//                        System.out.println("Found: " + command);
+                        processCommand(command);
+                    }
+                }
             }
         }
 
