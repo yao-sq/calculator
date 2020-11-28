@@ -42,6 +42,7 @@ import java.util.regex.Pattern;
 public class SRPN {
     private int result;
     Stack stack = new Stack<Integer>();
+    boolean isComment;
 
     public boolean isNumeric(String s) {
         try {
@@ -196,8 +197,11 @@ public class SRPN {
     public void processLine(String s) {
         // String to be scanned to find the pattern
         String line = s;
+        line = line.replaceAll("#.*#", "");
+
+
 //        String pattern = "(?<number>\\d*)?|(?<operator>\\+|-|\\*|/|%|=|d)?";
-        String patternSeperation = "(?<number>-?\\d+)|(?<operator>\\+|-|\\*|/|%|=|[d]|\\^)";
+        String patternSeperation = "(?<number>-?\\d+)|(?<operator>\\+|-|\\*|/|%|=|[d]|\\^)|#";
 
         // Create a Pattern object
         Pattern r = Pattern.compile(patternSeperation);
@@ -206,8 +210,15 @@ public class SRPN {
         Matcher m = r.matcher(line);
 
         while (m.find()){
-            System.out.println("Found: " + m.group());
-            processCommand(m.group());
+            if (m.group().equals("#")){
+                isComment = !isComment;
+                continue;
+            }
+
+            if ( !isComment) {
+                System.out.println("Found: " + m.group());
+                processCommand(m.group());
+            }
         }
 
     }
