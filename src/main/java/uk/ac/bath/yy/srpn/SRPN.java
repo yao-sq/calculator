@@ -42,8 +42,7 @@ public class SRPN {
     private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#]+)");
     private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "d", "^", "*", "/", "%", "+", "-")::indexOf);
 
-    private int result;
-    Stack stack = new Stack<Integer>();
+    Stack<Double> stack = new Stack<>();
     boolean isComment;
 
     public boolean isNumeric(String s) {
@@ -55,35 +54,7 @@ public class SRPN {
         }
     }
 
-    public int checkSaturationForPlus(int num1, int num2, int result){
-        result = (int) ( (double) num1 + (double) num2);
-        return result;
-    }
 
-    public int checkSaturationForMinus(int num1, int num2, int result){
-        result = (int) ( (double) num1 - (double) num2);
-        return result;
-    }
-
-    public int checkSaturationForMultiply(int num1, int num2, int result){
-        result = (int) ( (double) num1 * (double) num2);
-        return result;
-    }
-
-    public int checkSaturationForDivide(int num1, int num2, int result){
-        result = (int) ( (double) num1 / (double) num2);
-        return result;
-    }
-
-    public int checkSaturationForMod(int num1, int num2, int result){
-        result = (int) ( (double) num1 % (double) num2);
-        return result;
-    }
-
-    public int checkSaturationForPower(int num1, int num2, int result){
-        result = (int) ( Math.pow( (double) num1, (double) num2));
-        return result;
-    }
 
 //    public int checkSaturationForPlus(int num1, int num2, int result) {
 //        if (num1>0 && num2>0 && result < 0)
@@ -107,14 +78,15 @@ public class SRPN {
     public void processCommand(String s) {
         if (!s.equals("=")) {
             if ( isNumeric(s)) {
-                stack.push(Integer.parseInt(s));
+                stack.push((double) Integer.parseInt(s));
             }
             else {
-                Object num2;
-                Object num1;
+                double num2;
+                double num1;
+                double result;
                 switch (s) {
                     case "d":
-                        stack.forEach( e -> System.out.println(e));
+                        stack.forEach( e -> System.out.println((int) (double) e));
                         break;
                     case "^":
                         if (stack.size() <=1){
@@ -123,8 +95,7 @@ public class SRPN {
                         else {
                             num2 = stack.pop();
                             num1 = stack.pop();
-                            result = (int) Math.pow( (int) num1, (int) num2);
-                            stack.push(result);
+                            stack.push(clampInt(Math.pow( num1, num2)));
                         }
                         break;
                     case "+":
@@ -134,8 +105,7 @@ public class SRPN {
                         else {
                             num2 = stack.pop();
                             num1 = stack.pop();
-                            result = (int) num1 + (int) num2;
-                            stack.push(checkSaturationForPlus( (int) num1, (int) num2, result ));
+                            stack.push(clampInt(num1 + num2));
                         }
                         break;
                     case "-":
@@ -145,8 +115,7 @@ public class SRPN {
                         else {
                             num2 = stack.pop();
                             num1 = stack.pop();
-                            result = (int) num1 - (int) num2;
-                            stack.push(checkSaturationForMinus((int) num1, (int) num2, result));
+                            stack.push(clampInt(num1 - num2));
                         }
                         break;
                     case "*":
@@ -156,8 +125,7 @@ public class SRPN {
                         else {
                             num2 = stack.pop();
                             num1 = stack.pop();
-                            result = (int) num1 * (int) num2;
-                            stack.push(checkSaturationForMultiply((int) num1, (int) num2, result));
+                            stack.push(clampInt(num1 * num2));
                         }
                         break;
                     case "/":
@@ -171,8 +139,7 @@ public class SRPN {
                                 System.out.println("Divide by 0.");
                             }
                             else{
-                                result = (int) num1 / (int) num2;
-                                stack.push(checkSaturationForDivide((int) num1, (int) num2, result));
+                                stack.push(clampInt(num1 / num2));
                             }
                         }
                         break;
@@ -183,17 +150,20 @@ public class SRPN {
                         else {
                             num2 = stack.pop();
                             num1 = stack.pop();
-                            result = (int) num1 % (int) num2;
-                            stack.push(checkSaturationForMod((int) num1, (int) num2, result));
+                            stack.push(clampInt(num1 % num2));
                         }
                         break;
                 }
             }
         } else {
-            System.out.println(stack.peek());
+            System.out.println((int) (double) stack.peek());
 //            return stack.peek();
 
         }
+    }
+
+    private double clampInt(double number) {
+        return Math.min(Math.max(number, Integer.MIN_VALUE), Integer.MAX_VALUE);
     }
 
     public void processLine(String s) {
