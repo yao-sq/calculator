@@ -48,7 +48,7 @@ public class SRPN {
     private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#]+)");
     private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "^", "*", "/", "%", "+", "-", "d")::indexOf);
 
-    private Stack<Double> stack = new Stack<>();
+    private Stack<Double> stack = new BoundedStack<>(23);
     private boolean isComment;
 
     private boolean isNumeric(String s) {
@@ -147,5 +147,21 @@ public class SRPN {
             }
         }
 
+    }
+
+
+    public static class BoundedStack<E> extends Stack<E> {
+        private final int sizeLimit;
+        public BoundedStack(int sizeLimit) {
+            this.sizeLimit = sizeLimit;
+        }
+
+        @Override
+        public E push(E item) {
+            if ( this.size() >= sizeLimit){
+                throw new IllegalStateException("Stack overflow.");
+            }
+            return super.push(item);
+        }
     }
 }
