@@ -43,10 +43,11 @@ import static java.util.Comparator.comparingInt;
 // pass tests & write tests instead of mannually typing them
 // write comment & tidy up code
 // check slack
+// added r, but not sure of precendence
 
 public class SRPN {
-    private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#]+)");
-    private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "^", "*", "/", "%", "+", "-", "d")::indexOf);
+    private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#r]+)");
+    private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "^", "*", "/", "%", "+", "-", "d", "r")::indexOf);
 
     private Stack<Double> stack = new BoundedStack<>(23);
     private boolean isComment;
@@ -72,6 +73,11 @@ public class SRPN {
                     break;
                 case "d":
                     stack.forEach(e -> System.out.println((int) (double) e));
+                    break;
+                case "r":
+                    Random rand = new Random();
+                    int n = rand.nextInt();
+                    stack.push( (double) n);
                     break;
                 case "^":
                     binaryOperator(Math::pow);
