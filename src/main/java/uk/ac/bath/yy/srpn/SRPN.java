@@ -51,11 +51,6 @@ public class SRPN {
     private Stack<Double> stack = new Stack<>();
     private boolean isComment;
 
-    private Map<String, Runnable> operations = new HashMap<String, Runnable>(){{
-        put("=", () -> System.out.println((int) (double) stack.peek()));
-        put("d", () -> stack.forEach(e -> System.out.println((int) (double) e)));
-    }};
-
     private boolean isNumeric(String s) {
         try {
             Double.parseDouble(s);
@@ -71,9 +66,6 @@ public class SRPN {
                 stack.push((double) Integer.parseInt(s));
                 return;
             }
-//            ofNullable(operations.get(s))
-//                    .orElseThrow(() -> new IllegalArgumentException("Unrecognized token " + s))
-//                    .run();
             switch (s) {
                 case "=":
                     System.out.println((int) (double) stack.peek());
