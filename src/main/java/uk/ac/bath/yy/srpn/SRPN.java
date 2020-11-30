@@ -1,6 +1,7 @@
 package uk.ac.bath.yy.srpn;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,14 +39,24 @@ import static java.util.Comparator.comparingInt;
  *
  */
 
+//TODO: doc is for people who don't see the code
+// pass tests & write tests instead of mannually typing them
+// write comment & tidy up code
+// check slack
+
 public class SRPN {
     private static final Pattern PATTERN_TOKEN = Pattern.compile("(-?\\d+)|(?<operators>[=^*/+\\-%d#]+)");
-    private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "d", "^", "*", "/", "%", "+", "-")::indexOf);
+    private static final Comparator<String> OPERATOR_COMPARATOR = comparingInt(asList("=", "^", "*", "/", "%", "+", "-", "d")::indexOf);
 
-    Stack<Double> stack = new Stack<>();
-    boolean isComment;
+    private Stack<Double> stack = new Stack<>();
+    private boolean isComment;
 
-    public boolean isNumeric(String s) {
+    private Map<String, Runnable> operations = new HashMap<String, Runnable>(){{
+        put("=", () -> System.out.println((int) (double) stack.peek()));
+        put("d", () -> stack.forEach(e -> System.out.println((int) (double) e)));
+    }};
+
+    private boolean isNumeric(String s) {
         try {
             Double.parseDouble(s);
             return true;
@@ -54,112 +65,58 @@ public class SRPN {
         }
     }
 
-
-
-//    public int checkSaturationForPlus(int num1, int num2, int result) {
-//        if (num1>0 && num2>0 && result < 0)
-//            return Integer.MAX_VALUE;
-//        else if (num1<0 && num2<0 && result > 0)
-//            return Integer.MIN_VALUE;
-//        return result;
-//    }
-
-
-//    public int checkSaturationForMinus(int num1, int num2, int result) {
-//        if (num1==Integer.MAX_VALUE && num2==Integer.MIN_VALUE)
-//            return Integer.MAX_VALUE;
-//        if (num1>0 && num2<0 && result <0)
-//            return Integer.MAX_VALUE;
-//        else if (num1<0 && num2>0 && result>0)
-//            return Integer.MIN_VALUE;
-//        return result;
-//    }
-
     public void processCommand(String s) {
-        if (!s.equals("=")) {
-            if ( isNumeric(s)) {
+        try {
+            if (isNumeric(s)) {
                 stack.push((double) Integer.parseInt(s));
+                return;
             }
-            else {
-                double num2;
-                double num1;
-                double result;
-                switch (s) {
-                    case "d":
-                        stack.forEach( e -> System.out.println((int) (double) e));
-                        break;
-                    case "^":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
+//            ofNullable(operations.get(s))
+//                    .orElseThrow(() -> new IllegalArgumentException("Unrecognized token " + s))
+//                    .run();
+            switch (s) {
+                case "=":
+                    System.out.println((int) (double) stack.peek());
+                    break;
+                case "d":
+                    stack.forEach(e -> System.out.println((int) (double) e));
+                    break;
+                case "^":
+                    binaryOperator(Math::pow);
+                    break;
+                case "+":
+                    binaryOperator(Double::sum);
+                    break;
+                case "-":
+                    binaryOperator((num1, num2) -> num1 - num2);
+                    break;
+                case "*":
+                    binaryOperator((num1, num2) -> num1 * num2);
+                    break;
+                case "/":
+                    binaryOperator((num1, num2) -> {
+                        if (num2 == 0) {
+                            throw new IllegalArgumentException("Divide by 0.");
                         }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            stack.push(clampInt(Math.pow( num1, num2)));
-                        }
-                        break;
-                    case "+":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
-                        }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            stack.push(clampInt(num1 + num2));
-                        }
-                        break;
-                    case "-":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
-                        }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            stack.push(clampInt(num1 - num2));
-                        }
-                        break;
-                    case "*":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
-                        }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            stack.push(clampInt(num1 * num2));
-                        }
-                        break;
-                    case "/":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
-                        }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            if ( (int) num2==0) {
-                                System.out.println("Divide by 0.");
-                            }
-                            else{
-                                stack.push(clampInt(num1 / num2));
-                            }
-                        }
-                        break;
-                    case "%":
-                        if (stack.size() <=1){
-                            System.out.println("Stack underflow.");
-                        }
-                        else {
-                            num2 = stack.pop();
-                            num1 = stack.pop();
-                            stack.push(clampInt(num1 % num2));
-                        }
-                        break;
-                }
+                        return num1 / num2;
+                    });
+                    break;
+                case "%":
+                    binaryOperator((num1, num2) -> num1 % num2);
+                    break;
             }
-        } else {
-            System.out.println((int) (double) stack.peek());
-//            return stack.peek();
-
+        } catch (RuntimeException err) {
+            System.out.println(err.getMessage());
         }
+    }
+
+    private void binaryOperator(BinaryOperator<Double> operation) {
+        if (stack.size() <= 1) {
+            throw new IllegalStateException("Stack underflow.");
+        }
+        double num2 = stack.pop();
+        double num1 = stack.pop();
+        stack.push(clampInt(operation.apply(num1, num2)));
     }
 
     private double clampInt(double number) {
