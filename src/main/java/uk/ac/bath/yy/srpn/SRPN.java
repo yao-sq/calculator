@@ -72,6 +72,9 @@ public class SRPN {
         int processedIndex = 0;
 
         while (m.find()){
+            int currentProcessedIndex = processedIndex;
+            processedIndex = m.end();
+
             if (m.group().equals("#")){
                 inCommentMode = !inCommentMode;
                 continue;
@@ -80,10 +83,9 @@ public class SRPN {
                 continue;
             }
 
-            if (m.start() > processedIndex) {
-                warnUnrecognized(input.substring(processedIndex, m.start()));
+            if (m.start() > currentProcessedIndex) {
+                warnUnrecognized(line.substring(currentProcessedIndex, m.start()));
             }
-            processedIndex = m.end();
 
             String[] commands = {m.group()};
 
@@ -96,8 +98,8 @@ public class SRPN {
             }
         }
 
-        if (processedIndex < input.length()) {
-            warnUnrecognized(input.substring(processedIndex));
+        if (processedIndex < line.length()) {
+            warnUnrecognized(line.substring(processedIndex));
         }
     }
 
