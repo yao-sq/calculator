@@ -3,14 +3,17 @@ package uk.ac.bath.yy.srpn;
 import java.io.*;
 
 public class Main {
-
     // main method
     // reads in input from the command line
     // and passes this input to the processCommand method in uk.ac.bath.yy2376.srpn.SRPN
 
+    /**
+     * {@link SRPN#processLine(String)}
+     * @param args
+     */
     public static void main(String[] args) {
         // Code to take input from the command line
-        // This input is passed to the processCommand
+        // This input is passed to the processLine, processCommand
         // method in uk.ac.bath.yy2376.srpn.SRPN.java
         SRPN srpn = new SRPN();
 
