@@ -63,12 +63,13 @@ public class SRPN {
      *  <li>Same for any other pair-wise recognised operators. This suggests precedence is needed.</li>
      * </ul>
      *
-     * @param s a line that is fed into the method as input <br>
+     * @param input a line that is fed into the method as input <br>
      */
-    public void processLine(String s) {
-        String line = s.replaceAll("#.*#", "");
+    public void processLine(String input) {
+        String line = input.replaceAll("#.*#", "");
 
         Matcher m = PATTERN_TOKEN.matcher(line);
+        int processedIndex = 0;
 
         while (m.find()){
             if (m.group().equals("#")){
@@ -78,6 +79,12 @@ public class SRPN {
             if (inCommentMode) {
                 continue;
             }
+
+            if (m.start() > processedIndex) {
+                warnUnrecognized(input.substring(processedIndex, m.start()));
+            }
+            processedIndex = m.end();
+
             String[] commands = {m.group()};
 
             if (m.group("operators") != null) {
@@ -87,6 +94,10 @@ public class SRPN {
             for (String command : commands) {
                 processCommand(command);
             }
+        }
+
+        if (processedIndex < input.length()) {
+            warnUnrecognized(input.substring(processedIndex));
         }
     }
 
@@ -211,6 +222,14 @@ public class SRPN {
         }
     }
 
+    private void warnUnrecognized(String unrecognized) {
+        for (String token : unrecognized.split("")) {
+            if (token.trim().isEmpty()) {
+                continue;
+            }
+            System.out.println("Unrecognised operator or operand \"" + token + "\".");
+        }
+    }
 
     /**
      * Similar to a normal Stack, but check if the size is exceeding the sizeLimit

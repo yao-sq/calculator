@@ -99,6 +99,24 @@ public class SRPNTest {
     }
 
     @Test
+    public void testUnrecognised_1() {
+        check(perform("a"), "Unrecognised operator or operand \"a\".");
+    }
+    @Test
+    public void testUnrecognised_2() {
+        check(perform("1."), "Unrecognised operator or operand \".\".");
+    }
+    @Test
+    public void testUnrecognised_3() {
+        check(perform("1.2"), "Unrecognised operator or operand \".\".");
+    }
+    @Test
+    public void testUnrecognised_4() {
+        check(perform("abc"),
+                "Unrecognised operator or operand \"a\".", "Unrecognised operator or operand \"b\".", "Unrecognised operator or operand \"c\".");
+    }
+
+    @Test
     public void experiment002() {
         check(perform("11+1+1"), "13");
     }
