@@ -1,4 +1,4 @@
-package uk.ac.bath.yy.srpn;
+package cw.calculator;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -9,16 +9,15 @@ import java.util.Arrays;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
-public class SRPNTest {
+public class CalculatorTest {
     @Rule
     public OutputCaptureRule output = new OutputCaptureRule();
 
-    private SRPN sut;
+    private Calculator sut;
 
     @Before
     public void setup() {
-        sut = new SRPN();
+        sut = new Calculator();
     }
     private String perform(String... lines) {
         Arrays.stream(lines).forEach(sut::processLine);

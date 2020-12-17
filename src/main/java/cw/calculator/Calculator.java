@@ -1,4 +1,4 @@
-package uk.ac.bath.yy.srpn;
+package cw.calculator;
 
 import java.util.Arrays;
 import java.util.Comparator;
@@ -11,13 +11,13 @@ import static java.util.Arrays.asList;
 import static java.util.Comparator.comparingInt;
 
 /**
- * Program class for an SRPN calculator. It simulates the functionalities of a legacy SRPN calculator. It should include the functionalities below.
+ * Program class for a calculator. It simulates the functionalities of a legacy calculator. It should include the functionalities below.
  *
  * <ul>
  *  <li> Functionality 1: input at least two numbers and perform one operation correctly and output.</li>
  *  <li> Functionality 2: handle multiple numbers and multiple operations.</li>
  *  <li> Functionality 3: correctly handle saturation.</li>
- *  <li> Functionality 4: includes the less obvious features of SRPN. e.g.'r' output a set of 22 random numbers;'d' is intended to output all the elements in a stack.</li>
+ *  <li> Functionality 4: includes the less obvious features. e.g.'r' output a set of 22 random numbers;'d' is intended to output all the elements in a stack.</li>
  * </ul>
  * <br>
  *
@@ -34,7 +34,7 @@ import static java.util.Comparator.comparingInt;
  * <p>
  *     The main method of this class is processLine
  */
-public class SRPN {
+public class Calculator {
     /**
      * A regex pattern for a number or a couple of operators
      */
