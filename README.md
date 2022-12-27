@@ -9,8 +9,6 @@ It simulates the functionalities of a legacy calculator. It should include the f
    <li> Functionality 4: includes the less obvious features. e.g.'r' output a set of 22 random numbers;'d' is intended to output all the elements in a stack.</li>
   </ul>
   <br>
- 
-  <p>
   In addition to the above, additional functionalities explored include the following
   <ul>
    <li> using bigger Data Types double, test case:  1 2 3 / - = should output 0.</li>
